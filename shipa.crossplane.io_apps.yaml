@@ -1,0 +1,312 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: apps.shipa.crossplane.io
+spec:
+  group: shipa.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - shipa
+    kind: App
+    listKind: AppList
+    plural: apps
+    singular: app
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: A App represents the declarative state of a Shipa app.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: A AppSpec defines the desired state of a App.
+            properties:
+              deletionPolicy:
+                description: DeletionPolicy specifies what will happen to the underlying external when this managed resource is deleted - either "Delete" or "Orphan" the external resource. The "Delete" policy is the default when no policy is specified.
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                description: AppCreateParameters are the fields to create an App.
+                properties:
+                  framework:
+                    type: string
+                  name:
+                    type: string
+                  plan:
+                    type: string
+                  tags:
+                    items:
+                      type: string
+                    type: array
+                  teamOwner:
+                    type: string
+                required:
+                - name
+                type: object
+              providerConfigRef:
+                description: ProviderConfigReference specifies how the provider that will be used to create, observe, update, and delete this managed resource should be configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              providerRef:
+                description: 'ProviderReference specifies the provider that will be used to create, observe, update, and delete this managed resource. Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: WriteConnectionSecretToReference specifies the namespace and name of a Secret to which any connection details for this managed resource should be written. Connection details frequently include the endpoint, username, and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: A AppStatus represents the observed state of a App.
+            properties:
+              atProvider:
+                description: represents the observed state of a Shipa app.
+                properties:
+                  framework:
+                    type: string
+                  name:
+                    type: string
+                  plan:
+                    type: string
+                  tags:
+                    items:
+                      type: string
+                    type: array
+                  teamOwner:
+                    type: string
+                required:
+                - name
+                type: object
+              atProviderState:
+                description: AppParameters are the configurable fields of a App.
+                properties:
+                  cname:
+                    items:
+                      type: string
+                    type: array
+                  description:
+                    type: string
+                  entrypoints:
+                    items:
+                      description: Entrypoint - part of AppParameters
+                      properties:
+                        cname:
+                          type: string
+                        scheme:
+                          type: string
+                      type: object
+                    type: array
+                  framework:
+                    type: string
+                  ip:
+                    type: string
+                  lock:
+                    description: Lock - part of AppParameters
+                    properties:
+                      AcquireDate:
+                        type: string
+                      Locked:
+                        type: boolean
+                      Owner:
+                        type: string
+                      Reason:
+                        type: string
+                    type: object
+                  name:
+                    type: string
+                  org:
+                    type: string
+                  plan:
+                    description: AppPlan - app plan
+                    properties:
+                      cpushare:
+                        format: int64
+                        type: integer
+                      default:
+                        type: boolean
+                      memory:
+                        format: int64
+                        type: integer
+                      name:
+                        type: string
+                      org:
+                        type: string
+                      public:
+                        type: boolean
+                      swap:
+                        format: int64
+                        type: integer
+                      teams:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  platform:
+                    type: string
+                  routers:
+                    items:
+                      description: Router - part of AppParameters
+                      properties:
+                        address:
+                          type: string
+                        default:
+                          type: boolean
+                        name:
+                          type: string
+                        type:
+                          description: 'TODO: check Opts type Opts map[string]interface{} `json:"opts,omitempty"`'
+                          type: string
+                      type: object
+                    type: array
+                  status:
+                    type: string
+                  tags:
+                    items:
+                      type: string
+                    type: array
+                  teamowner:
+                    type: string
+                  units:
+                    items:
+                      description: Unit - part of AppParameters
+                      properties:
+                        Address:
+                          description: Address - part if Unit object
+                          properties:
+                            ForceQuery:
+                              type: boolean
+                            Fragment:
+                              type: string
+                            Host:
+                              type: string
+                            Opaque:
+                              type: string
+                            Path:
+                              type: string
+                            RawFragment:
+                              type: string
+                            RawPath:
+                              type: string
+                            RawQuery:
+                              type: string
+                            Scheme:
+                              type: string
+                            User:
+                              type: string
+                          type: object
+                        AppName:
+                          type: string
+                        HostAddr:
+                          type: string
+                        HostPort:
+                          type: string
+                        ID:
+                          type: string
+                        IP:
+                          type: string
+                        Name:
+                          type: string
+                        Org:
+                          type: string
+                        ProcessName:
+                          type: string
+                        Status:
+                          type: string
+                        Type:
+                          type: string
+                        Version:
+                          type: string
+                      type: object
+                    type: array
+                required:
+                - name
+                - teamowner
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time this condition transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A Message containing details about this condition's last transition from one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True, False, or Unknown?
+                      type: string
+                    type:
+                      description: Type of this condition. At most one of each condition type may apply to a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
